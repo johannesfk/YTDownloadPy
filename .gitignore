@@ -123,3 +123,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Media files
+.wav
+.webm
+.mp4
+.mp3

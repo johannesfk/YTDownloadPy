@@ -53,7 +53,7 @@ for i in vidIds:
         codec="pcm_s24le",
         id3v2_version="4",
         tags={
-            "artist": artist,½
+            "artist": artist,
             "title": video.title,
             "date": video.published[0:4]
         }
