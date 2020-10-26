@@ -7,9 +7,9 @@ from pydub import AudioSegment
 from pydub.utils import mediainfo
 
 pafy.set_api_key('AIzaSyCB7wHEvZyWRGzx69UDFe7CnUlPYYf3LLo')
-
-input = input('Enter Youtube links or Ids:\n')
-vidIds = input.split(',')
+codecInput = input('Sound codec\n0: WAV\n1: MP3')
+vidInput = input('Enter Youtube links or Ids:\n')
+vidIds = vidInput.split(',')
 print(vidIds)
 
 for i in vidIds:
