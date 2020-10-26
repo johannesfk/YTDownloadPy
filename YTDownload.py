@@ -7,7 +7,8 @@ from pydub import AudioSegment
 from pydub.utils import mediainfo
 
 pafy.set_api_key('AIzaSyCB7wHEvZyWRGzx69UDFe7CnUlPYYf3LLo')
-codecInput = input('Sound codec\n0: WAV\n1: MP3')
+
+codecInput = input('Sound codec:\n0: WAV\n1: MP3\n')
 vidInput = input('Enter Youtube links or Ids:\n')
 vidIds = vidInput.split(',')
 print(vidIds)
@@ -38,7 +39,7 @@ for i in vidIds:
     artist = video.author
     if artist.endswith("Topic"):
         artist = artist[:-8]
-    dst = artist + " - " + bestaudio.title + ".wav"
+    dst = artist + " - " + bestaudio.title
 
     srcMetadata = {
         "artist": artist,
@@ -46,17 +47,34 @@ for i in vidIds:
         "date": video.published[0:4]
     }
     print(srcMetadata)
-    # convert webm to wav                                                            
+    print(codecInput)
+    # convert webm to selected format wav/mp3                                                           
     sound = AudioSegment.from_file(src, "webm", )
-    sound.export(dst,
-        format="wav",
-        codec="pcm_s24le",
-        id3v2_version="4",
-        tags={
-            "artist": artist,
-            "title": video.title,
-            "date": video.published[0:4]
-        }
-    )
+    if codecInput == "0":
+        dst = dst + ".wav"
+        print("Converting " + dst)
+        sound.export(dst,
+            format="wav",
+            codec="pcm_s24le",
+            id3v2_version="4",
+            tags={
+                "artist": artist,
+                "title": video.title,
+                "date": video.published[0:4]
+            }
+        )
+    if codecInput == "1":
+        dst = dst + ".mp3"
+        print("Converting " + dst)
+        sound.export(dst,
+            format="mp3",
+            bitrate="320k",
+            id3v2_version="4",
+            tags={
+                "artist": artist,
+                "title": video.title,
+                "date": video.published[0:4]
+            }
+        )
     print("Track Downloaded")
-    # remove(src)
+    remove(src)
