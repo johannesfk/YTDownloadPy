@@ -129,3 +129,6 @@ dmypy.json
 *.webm
 *.mp4
 *.mp3
+*.part
+*.opus
+*.vp9
