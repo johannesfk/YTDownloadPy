@@ -17,10 +17,10 @@ for i in vidIds:
     
     text = i
     try:
-        found = re.search('(?<=v=).*?(?=&feature)', text).group(0)
+        # found = re.search('(?<=v=).*?(?=&feature)', text).group(0)
+        found = re.search('(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})', text).group(0)
     except AttributeError:
-        # AAA, ZZZ not found in the original string
-        found = 'error' # apply your error handling
+            found = 'error' # apply your error handling
     print(found)
     
     video = pafy.new(found)
