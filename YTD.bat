@@ -11,3 +11,5 @@ echo Running YTD Tool...
 echo .
 
 python YTDownload.py
+
+pause
