@@ -1,5 +1,5 @@
 DateTime>=4.3
-pafy>=0.5.5
+git+https://github.com/Cupcakus/pafy
 pydub>=0.24.1
 pytz>=2020.5
 youtube-dl>=2021.1.8
