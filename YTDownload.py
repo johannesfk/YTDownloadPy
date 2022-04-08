@@ -1,15 +1,65 @@
-import pafy
+import json
+import yt_dlp
 import re
-import datetime
 
 from os import path, remove
-from pydub import AudioSegment
-from pydub.utils import mediainfo
 
-pafy.set_api_key('AIzaSyCB7wHEvZyWRGzx69UDFe7CnUlPYYf3LLo')
+class MyLogger:
+    def debug(self, msg):
+        # For compatibility with youtube-dl, both debug and info are passed into debug
+        # You can distinguish them by the prefix '[debug] '
+        if msg.startswith('[debug] '):
+            pass
+        else:
+            self.info(msg)
+
+    def info(self, msg):
+        pass
+
+    def warning(self, msg):
+        pass
+
+    def error(self, msg):
+        print(msg)
+
+
+# ℹ️ See the docstring of yt_dlp.postprocessor.common.PostProcessor
+class MyCustomPP(yt_dlp.postprocessor.PostProcessor):
+    # ℹ️ See docstring of yt_dlp.postprocessor.common.PostProcessor.run
+    def run(self, info):
+        self.to_screen('Doing stuff')
+        return [], info
+
+
+# ℹ️ See "progress_hooks" in the docstring of yt_dlp.YoutubeDL
+def my_hook(d):
+    if d['status'] == 'finished':
+        print('Done downloading, now converting ...')
 
 codecInput = input('Sound codec:\n0: WAV\n1: MP3\n')
 vidInput = input('Enter Youtube links or Ids:\n')
+
+outputCodec = 'wav'
+
+if codecInput == "0":
+    outputCodec = "wav"
+if codecInput == "1":
+    outputCodec = "mp3"
+
+ydl_opts = {
+    'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': outputCodec,
+        'preferredquality': '320',
+    }],
+    'logger': MyLogger(),
+    'progress_hooks': [my_hook],
+    # Add custom headers
+    'http_headers': {'Referer': 'https://www.google.com'}
+}
+
+
 vidIds = vidInput.split(',')
 print(vidIds)
 
@@ -22,59 +72,10 @@ for i in vidIds:
     except AttributeError:
             found = 'error' # apply your error handling
     print(found)
-    
-    video = pafy.new(found)
-    bestaudio = video.getbestaudio()
-    bestaudio.bitrate #get bit rate
-    bestaudio.extension #extension of audio fileurl
-    ...
-    bestaudio.url #get url
-    ...
-    #download if you want
-    bestaudio.download()
 
-    # Convert to wav                                                                       
-    src = bestaudio.title + "." + bestaudio.extension
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.add_post_processor(MyCustomPP())
+        info = ydl.extract_info(text)
 
-    artist = video.author
-    if artist.endswith("Topic"):
-        artist = artist[:-8]
-    dst = artist + " - " + bestaudio.title
-
-    srcMetadata = {
-        "artist": artist,
-        "title": video.title,
-        "date": video.published[0:4]
-    }
-    print(srcMetadata)
-    print(codecInput)
-    # convert webm to selected format wav/mp3                                                           
-    sound = AudioSegment.from_file(src, "webm", )
-    if codecInput == "0":
-        dst = dst + ".wav"
-        print("Converting " + dst)
-        sound.export(dst,
-            format="wav",
-            codec="pcm_s24le",
-            id3v2_version="4",
-            tags={
-                "artist": artist,
-                "title": video.title,
-                "date": video.published[0:4]
-            }
-        )
-    if codecInput == "1":
-        dst = dst + ".mp3"
-        print("Converting " + dst)
-        sound.export(dst,
-            format="mp3",
-            bitrate="320k",
-            id3v2_version="4",
-            tags={
-                "artist": artist,
-                "title": video.title,
-                "date": video.published[0:4]
-            }
-        )
-    print("Track Downloaded")
-    remove(src)
+        # ℹ️ ydl.sanitize_info makes the info json-serializable
+        # print(json.dumps(ydl.sanitize_info(info)))

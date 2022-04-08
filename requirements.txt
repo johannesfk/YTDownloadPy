@@ -1,6 +1,6 @@
 DateTime>=4.3
-git+https://github.com/Cupcakus/pafy
 pydub>=0.24.1
+yt-dlp
 pytz>=2020.5
 youtube-dl>=2021.1.8
 zope.interface>=5.2.0
